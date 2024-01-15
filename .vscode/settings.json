@@ -1,0 +1,19 @@
+{
+  "cSpell.words": [
+    "fromarray",
+    "getpixel",
+    "gradio",
+    "krita",
+    "lanczos",
+    "librosa",
+    "mels",
+    "melspectrogram",
+    "ndarray",
+    "piptrack",
+    "putpixel",
+    "rolloff",
+    "samplerate",
+    "soundfile",
+    "spectro"
+  ]
+}
