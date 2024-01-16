@@ -22,6 +22,7 @@ from effects.image_effects import apply_blur, \
                                   apply_rotation, \
                                   apply_scale, \
                                   apply_noise, \
+                                  apply_crop, \
                                   apply_offset
 
 import gradio as gr
@@ -591,6 +592,7 @@ with gr.Blocks(title="spectro-noise") as blocks:
                             "Scale",
                             "Offset",
                             "Noise",
+                            "Crop",
                         ],
                         type="index",
                     )
@@ -782,6 +784,39 @@ with gr.Blocks(title="spectro-noise") as blocks:
                             value=0,
                         )
 
+                    with gr.Group(visible=False) as group_effect_crop:
+                        slider_crop_offset_left = gr.Slider(
+                            label="Offset Left",
+                            minimum=0,
+                            maximum=2048,
+                            step=1,
+                            value=0,
+                        )
+
+                        slider_crop_offset_upper = gr.Slider(
+                            label="Offset Upper",
+                            minimum=0,
+                            maximum=2048,
+                            step=1,
+                            value=0,
+                        )
+
+                        slider_crop_offset_right = gr.Slider(
+                            label="Offset Right",
+                            minimum=0,
+                            maximum=2048,
+                            step=1,
+                            value=0,
+                        )
+
+                        slider_crop_offset_lower = gr.Slider(
+                            label="Offset Lower",
+                            minimum=0,
+                            maximum=2048,
+                            step=1,
+                            value=0,
+                        )
+
                     button_apply_image_effects_preview = gr.Button("Apply to Editor")
 
                 with gr.Column():
@@ -822,6 +857,7 @@ with gr.Blocks(title="spectro-noise") as blocks:
                     group_effect_scale,
                     group_effect_offset,
                     group_effect_noise,
+                    group_effect_crop,
                 ],
             )
 
@@ -1007,6 +1043,27 @@ with gr.Blocks(title="spectro-noise") as blocks:
                     state_effects_preview_spectrogram,
                 ],
             )
+
+            for slider_crop_offset in [
+                slider_crop_offset_left,
+                slider_crop_offset_upper,
+                slider_crop_offset_right,
+                slider_crop_offset_lower,
+            ]:
+                slider_crop_offset.change(
+                    fn=apply_crop,
+                    inputs=[
+                        state_effects_preview_spectrogram,
+                        slider_crop_offset_left,
+                        slider_crop_offset_upper,
+                        slider_crop_offset_right,
+                        slider_crop_offset_lower,
+                    ],
+                    outputs=[
+                        image_effects_preview_spectrogram,
+                    ],
+                    scroll_to_output=True,
+                )
 
             state_tab_editor_id = gr.State(value=tab_editor.id)
 

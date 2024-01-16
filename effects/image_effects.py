@@ -262,3 +262,29 @@ def apply_noise(input_image: Image.Image, factor: float) -> Image.Image:
     output_image = Image.fromarray(image_array_noisy)
 
     return output_image
+
+def apply_crop(
+    input_image: Image.Image,
+    offset_left: int,
+    offset_upper: int,
+    offset_right: int,
+    offset_lower: int,
+) -> Image.Image:
+    width, height = input_image.size
+
+    left = offset_left
+    upper = offset_upper
+    right = width - offset_right
+    lower = height - offset_lower
+
+    cropped_image = input_image.crop((left, upper, right, lower))
+
+    output_image = Image.new(
+        mode=input_image.mode,
+        size=(width, height),
+        color=(0, 0, 0),
+    )
+
+    output_image.paste(cropped_image, (left, upper))
+
+    return output_image
