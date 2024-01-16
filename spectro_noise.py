@@ -142,6 +142,7 @@ def on_click_to_audio(
     hop_length: int,
     pitch_shift: float,
     gain: float,
+    gain_multiplier: float,
     clip: float,
 ) -> Tuple[
     str,
@@ -181,10 +182,12 @@ def on_click_to_audio(
             n_steps=pitch_shift,
         )
 
-    is_gain_changed = gain > 1.0 or gain < 1.0
+    gain_total = gain * gain_multiplier
+
+    is_gain_changed = gain_total > 1.0 or gain_total < 1.0
 
     if is_gain_changed:
-        audio_data = audio_data * gain
+        audio_data = audio_data * gain_total
 
     if clip < 1.0 or is_gain_changed:
         audio_data = np.clip(audio_data, -clip, clip)
@@ -1077,6 +1080,12 @@ with gr.Blocks(title="spectro-noise") as blocks:
                         value=1.0,
                     )
 
+                    slider_gain_multiplier_to_audio = gr.Radio(
+                        label="Gain Multiplier",
+                        choices=[1, 10, 100, 1000, 10000, 100000],
+                        value=1,
+                    )
+
                     slider_clip_to_audio = gr.Slider(
                         label="Clip",
                         minimum=0,
@@ -1136,6 +1145,7 @@ with gr.Blocks(title="spectro-noise") as blocks:
                     slider_hop_length_to_audio,
                     slider_pitch_shift_to_audio,
                     slider_gain_to_audio,
+                    slider_gain_multiplier_to_audio,
                     slider_clip_to_audio,
                 ],
                 outputs=[
