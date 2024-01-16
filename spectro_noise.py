@@ -21,6 +21,7 @@ from effects.image_effects import apply_blur, \
                                   apply_skew, \
                                   apply_rotation, \
                                   apply_scale, \
+                                  apply_noise, \
                                   apply_offset
 
 import gradio as gr
@@ -586,6 +587,7 @@ with gr.Blocks(title="spectro-noise") as blocks:
                             "Rotation",
                             "Scale",
                             "Offset",
+                            "Noise",
                         ],
                         type="index",
                     )
@@ -768,6 +770,15 @@ with gr.Blocks(title="spectro-noise") as blocks:
                             value=0,
                         )
 
+                    with gr.Group(visible=False) as group_effect_noise:
+                        slider_noise_value = gr.Slider(
+                            label="Factor",
+                            minimum=0.0,
+                            maximum=1.0,
+                            step=0.01,
+                            value=0,
+                        )
+
                     button_apply_image_effects_preview = gr.Button("Apply to Editor")
 
                 with gr.Column():
@@ -807,6 +818,7 @@ with gr.Blocks(title="spectro-noise") as blocks:
                     group_effect_rotation,
                     group_effect_scale,
                     group_effect_offset,
+                    group_effect_noise,
                 ],
             )
 
@@ -969,6 +981,18 @@ with gr.Blocks(title="spectro-noise") as blocks:
                     ],
                     scroll_to_output=True,
                 )
+
+            slider_noise_value.change(
+                fn=apply_noise,
+                inputs=[
+                    state_effects_preview_spectrogram,
+                    slider_noise_value,
+                ],
+                outputs=[
+                    image_effects_preview_spectrogram,
+                ],
+                scroll_to_output=True,
+            )
 
             button_apply_image_effects_preview.click(
                 fn=on_click_apply_image_effects_preview,

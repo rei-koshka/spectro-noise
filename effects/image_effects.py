@@ -3,6 +3,8 @@ from PIL import Image, \
                 ImageOps, \
                 ImageFilter
 
+import numpy as np
+
 from typing import List, Any
 
 import math
@@ -246,5 +248,17 @@ def apply_waves(
             if 0 <= new_y < height:
                 pixel = input_image.getpixel((x, new_y))
                 output_image.putpixel((x, y), pixel)
+
+    return output_image
+
+def apply_noise(input_image: Image.Image, factor: float) -> Image.Image:
+    image_array = np.array(input_image)
+
+    noise = np.random.normal(scale=factor, size=image_array.shape)
+
+    image_array_noisy = image_array + noise
+    image_array_noisy = np.clip(image_array_noisy, 0, 255).astype(np.uint8)
+
+    output_image = Image.fromarray(image_array_noisy)
 
     return output_image
