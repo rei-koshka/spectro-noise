@@ -140,6 +140,8 @@ def on_click_to_audio(
     n_fft: int,
     hop_length: int,
     pitch_shift: float,
+    gain: float,
+    clip: float,
 ) -> Tuple[
     str,
     gr.Audio,
@@ -178,12 +180,20 @@ def on_click_to_audio(
             n_steps=pitch_shift,
         )
 
-        soundfile.write(
-            file=output_path,
-            data=audio_data,
-            samplerate=sample_rate,
-            subtype=SOUNDFILE_SUBTYPE,
-        )
+    is_gain_changed = gain > 1.0 or gain < 1.0
+
+    if is_gain_changed:
+        audio_data = audio_data * gain
+
+    if clip < 1.0 or is_gain_changed:
+        audio_data = np.clip(audio_data, -clip, clip)
+
+    soundfile.write(
+        file=output_path,
+        data=audio_data,
+        samplerate=sample_rate,
+        subtype=SOUNDFILE_SUBTYPE,
+    )
 
     audio_output_preview = gr.Audio(
         label="Output Audio Preview",
@@ -1035,6 +1045,22 @@ with gr.Blocks(title="spectro-noise") as blocks:
                         value=0,
                     )
 
+                    slider_gain_to_audio = gr.Slider(
+                        label="Gain",
+                        minimum=0,
+                        maximum=10.0,
+                        step=0.01,
+                        value=1.0,
+                    )
+
+                    slider_clip_to_audio = gr.Slider(
+                        label="Clip",
+                        minimum=0,
+                        maximum=1.0,
+                        step=0.01,
+                        value=1.0,
+                    )
+
                     button_convert_to_audio = gr.Button("Convert")
 
                 with gr.Column():
@@ -1085,6 +1111,8 @@ with gr.Blocks(title="spectro-noise") as blocks:
                     slider_n_fft_to_audio,
                     slider_hop_length_to_audio,
                     slider_pitch_shift_to_audio,
+                    slider_gain_to_audio,
+                    slider_clip_to_audio,
                 ],
                 outputs=[
                     textbox_output_audio,
@@ -1122,3 +1150,4 @@ with gr.Blocks(title="spectro-noise") as blocks:
             )
 
 blocks.launch()
+
